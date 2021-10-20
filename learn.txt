@@ -1,0 +1,11 @@
+基础语法
+并发
+微服务
+grpc
+mysql
+redis
+rabbitmq
+redis的几种数据类型 grpc用一下
+mysql主从同步技术 分布式锁
+go协成和锁 go 几种锁 once waitgroup
+pprof GC染色技术 协程原理
