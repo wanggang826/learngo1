@@ -1,0 +1,10 @@
+syntax = "proto3"; //告诉编译器用proto3 解读
+
+
+
+option go_package="go_grpc/pb/home;home";
+package home;
+
+message Home {
+  string home_num = 1;
+}

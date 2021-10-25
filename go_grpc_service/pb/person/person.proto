@@ -1,0 +1,25 @@
+syntax = "proto3"; //告诉编译器用proto3 解读
+
+option go_package="grpc_service/pb/person;person"; //go_mod包名开头
+
+
+package person;
+
+// 定义结构体
+message PersonReq{
+  string name = 1; //类型  key名称  唯一表示
+  int32 age =2;
+}
+
+message PersonRes{
+  string name = 1; //类型  key名称  唯一表示
+  int32 age =2;
+}
+
+service SearchService {
+  // 四种方法的声明
+  rpc Search (PersonReq) returns (PersonRes); // 即可响应的  普通服务
+  rpc SearchIn (stream PersonReq) returns (PersonRes); // 入参为流
+  rpc SearchOut (PersonReq) returns (stream PersonRes); // 出参为流
+  rpc SearchIo (stream PersonReq) returns (stream PersonRes); // 出入参均为流
+}

@@ -1,0 +1,52 @@
+syntax = "proto3"; //告诉编译器用proto3 解读
+
+option go_package="go_grpc/pb/person;person"; //go_mod包名开头
+
+// google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
+// google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+
+package person;
+
+import "home/home.proto";
+//message Home{
+//  repeated Person persons = 1;
+//  message V{ //可以嵌套
+//    string name = 1;
+//  }
+//  V v =2;
+//}
+// 定义结构体
+message Person{
+  string name = 1; //类型  key名称  唯一表示
+  int32 age =2;
+//  bool sex= 3;
+//  repeated string test = 4;
+//  map <string,string> test_map = 5;
+
+  enum SEX { //枚举类型 一定要有0
+    option allow_alias = true; // 数字唯一标识可重复用 WOMAN GIRL
+    MAN = 0;
+    WOMAN = 1;
+    GIRL = 1;
+    OTHER = 2;
+  }
+  oneof TestOneOf {
+    string one = 6;
+    string two = 7;
+    string three = 8;
+  }
+
+  home.Home i_home = 9;
+  SEX sex = 3;
+  reserved "test_map","test"; //变成保留值  以后要用，其他人就不能用了   否则编辑器会报错  (编译不会生成，值给编译器看)
+  reserved 5;
+}
+
+
+service SearchService {
+  // 四种方法的声明
+  rpc Search (Person) returns (Person); // 即可响应的  普通服务
+  rpc SearchIn (stream Person) returns (Person); // 入参为流
+  rpc SearchOut (Person) returns (stream Person); // 出参为流
+  rpc SearchIo (stream Person) returns (stream Person); // 出入参均为流
+}

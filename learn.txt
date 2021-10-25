@@ -1,11 +1,74 @@
 基础语法
-并发
-微服务
-grpc
-mysql
-redis
-rabbitmq
-redis的几种数据类型 grpc用一下
-mysql主从同步技术 分布式锁
+
+并发 goroutine channel 锁  上下文context
+
+微服务相关： 分而治之 合而用之
+微服务架构：将复杂的系统使用组件化的方式进行拆分，并使用轻量级通讯方式进行整合的一种设计方法。
+微服务框架： 具体的框架资源
+微服务：是通过这种架构设计方法拆分出来的一个独立的组件化的小应用。
+
+跨语言 跨平台 通讯格式protobuf
+通讯协议 gRPC
+调度管理服务发现 consul
+微服务的框架 micro
+部署        docker
+
+
+
+RPC  1.Call ID映射  2.序列化和反序列化 3.网络传输  三个机制
+概念：指远程过程调用，也就是说两台服务器A，B，一个应用部署在A服务器上，想要调用B服务器上应用提供的函数/方法，
+由于不在一个内存空间，不能直接调用，需要通过网络来表达调用的语义和传达调用的数据。
+
+// Client端
+//    int l_times_r = Call(ServerAddr, Multiply, lvalue, rvalue)
+1. 将这个调用映射为Call ID。这里假设用最简单的字符串当Call ID的方法
+2. 将Call ID，lvalue和rvalue序列化。可以直接将它们的值以二进制形式打包
+3. 把2中得到的数据包发送给ServerAddr，这需要使用网络传输层
+4. 等待服务器返回结果
+5. 如果服务器调用成功，那么就将结果反序列化，并赋给l_times_r
+
+// Server端
+1. 在本地维护一个Call ID到函数指针的映射call_id_map，可以用std::map<std::string, std::function<>>
+2. 等待请求
+3. 得到一个请求后，将其数据包反序列化，得到Call ID
+4. 通过在call_id_map中查找，得到相应的函数指针
+5. 将lvalue和rvalue反序列化后，在本地调用Multiply函数，得到结果
+6. 将结果序列化后通过网络返回给Client
+
+总结：
+Call ID映射可以直接使用函数字符串，也可以使用整数ID。映射表一般就是一个哈希表。
+序列化反序列化可以自己写，也可以使用Protobuf或者FlatBuffers之类的。
+网络传输库可以自己写socket，或者用asio，ZeroMQ，Netty之类。
+
+grpc gRPC HTTP2.0 Protobuf
+gRPC是由Google主导开发的RPC框架，使用HTTP/2协议并用Protobuf作为序列化工具
+https://github.com/grpc/grpc-go  grpc示例代码库
+https://grpc.io/docs/languages/go/quickstart/  grpc文档
+https://github.com/protocolbuffers/protobuf/releases  protobuf协议编译器： 安装解压 拷贝到GOPATH/bin  注意include也要拷贝
+go get -u google.golang.org/grpc
+go get -u github.com/golang/protobuf/protoc-gen-go  生成Go语言代码的工具
+go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+
+// 一下工具版本不对 版本不对的话  生成命令及生成文件目录不同
+go get google.golang.org/protobuf/cmd/protoc-gen-go@v1.26 生成Go语言代码的工具
+go get google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+
+
 go协成和锁 go 几种锁 once waitgroup
-pprof GC染色技术 协程原理
+pprof :用于系统性能分析
+import "net/http/pprof"
+import "runtime/pprof"
+https://zhuanlan.zhihu.com/p/51559344
+
+
+GC染色技术  标记、清除 内存管理  黑色 灰色 白色
+黑色: 对象在这次GC中已标记,且这个对象包含的子对象也已标记
+灰色: 对象在这次GC中已标记, 但这个对象包含的子对象未标记
+白色: 对象在这次GC中未标记
+
+协程原理：MGP 调度管理
+
+
+mysql主从同步技术 分布式锁  索引优化
+redis redis的几种数据类型  grpc用一下？
+rabbitmq
