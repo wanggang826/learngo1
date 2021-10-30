@@ -5,14 +5,13 @@ import (
 	"time"
 )
 
-// 简单写个协程池
+
 // ===========模拟任务Task===========
-//定义任务Tash
 type Task struct {
 	f func() error
 }
 
-// 创建Task
+// NewTask 创建Task
 func NewTask(arg_f func() error) *Task {
 	task := Task{
 		f: arg_f,
