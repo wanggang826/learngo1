@@ -1,101 +1,43 @@
 package main
-
 import (
+	"flag"
 	"fmt"
-	"reflect"
+	"strings"
 )
-
-func main()  {
-	DeferCall()
+//定义一个类型，用于增加该类型方法
+type sliceValue []string
+//new一个存放命令行参数值的slice
+func newSliceValue(vals []string, p *[]string) *sliceValue {
+	*p = vals
+	return (*sliceValue)(p)
 }
-
-func DeferCall() {
-	//defer func() { fmt.Println("打印前") }()
-	//defer func() { fmt.Println("打印中") }()
-	//defer func() { fmt.Println("打印后") }()
-	//fmt.Println("test")
-	//panic("触发异常")
-
-	paseStudent()
-
-	//runtime.GOMAXPROCS(1)
-	//wg := sync.WaitGroup{}
-	//wg.Add(20)
-	//for i := 0; i < 10; i++ {
-	//	go func() {
-	//		fmt.Println("J: ", i)
-	//		wg.Done()
-	//	}()
-	//}
-	//for i := 0; i < 10; i++ {
-	//	go func(i int) {
-	//		fmt.Println("i: ", i)
-	//		wg.Done()
-	//	}(i)
-	//}
-	//wg.Wait()
-
-
+/*
+Value接口：
+type Value interface {
+    String() string
+    Set(string) error
 }
-
-type student struct {
-	Name string
-	Age  int
+实现flag包中的Value接口，将命令行接收到的值用,分隔存到slice里
+*/
+func (s *sliceValue) Set(val string) error {
+	*s = sliceValue(strings.Split(val, ","))
+	fmt.Println("set====")
+	return nil
 }
-
-func paseStudent() {
-	//m := make(map[string]*student)
-	//stus := []student{
-	//	{Name: "zhou", Age: 24},
-	//	{Name: "li", Age: 23},
-	//	{Name: "wang", Age: 22},
-	//}
-	////for _, stu := range stus {
-	////	m[stu.Name] = &stu
-	////}
-	//for i:=0;i<len(stus);i++{
-	//	m[stus[i].Name] = &stus[i]
-	//}
-	//fmt.Println(m["li"].Name)
-	myMap := make(map[string]string, 10)
-	myMap["a"] = "b"
-	t := reflect.TypeOf(myMap)
-	fmt.Println("type:", t)
-	v := reflect.ValueOf(myMap)
-	fmt.Println("value:", v)
-
-	//a := []int{}
-	//b := []int{1,2,3}
-	//c := a
-	//a = append(b, 1)
-	//fmt.Println(a,b,c)
-
-	//mySlice := []int{10, 20, 30, 40, 50}
-	//for _, value := range mySlice {
-	//	value *= 2
-	//}
-	//fmt.Printf("mySlice %+v\n", mySlice)
-	//for index, _ := range mySlice {
-	//	mySlice[index] *= 2
-	//}
-	//fmt.Printf("mySlice %+v\n", mySlice)
-
+//flag为slice的默认值default is me,和return返回值没有关系
+func (s *sliceValue) String() string {
+	*s = sliceValue(strings.Split("default is me", ","))
+	fmt.Println("String====")
+	return "It's none of my business"
 }
-
-
-//type student struct {
-//	Name string
-//	Age  int
-//}
-//
-//func paseStudent() {
-//	m := make(map[string]*student)
-//	stus := []student{
-//		{Name: "zhou", Age: 24},
-//		{Name: "li", Age: 23},
-//		{Name: "wang", Age: 22},
-//	}
-//	for _, stu := range stus {
-//		m[stu.Name] = &stu
-//	}
-//}
+/*
+可执行文件名 -slice="java,go"  最后将输出[java,go]
+可执行文件名 最后将输出[default is me]
+*/
+func main(){
+	var languages []string
+	flag.Var(newSliceValue([]string{}, &languages), "slice", "I like programming `languages`")
+	flag.Parse()
+	//打印结果slice接收到的值
+	fmt.Println(languages)
+}

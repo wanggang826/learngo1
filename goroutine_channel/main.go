@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"sync"
 )
+/*
+
+*/
 
 /*
 两个goroutine

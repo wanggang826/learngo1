@@ -1,0 +1,24 @@
+master  主要工作：调度应用程序、维护应用程序的所需状态，扩展应用程序和滚动更新（先运行新容器2.0，所有请求都交到新容器，在关闭旧容器1.0）
+node  主要  运行容器应用  负责监听并汇报容器的状态，同时根据master的要求管理容器的生命周期。
+每个node都有kubelet(管理节点并与master进行通信的代理)
+pob（资源对象） k8s的最小工作单元 每个pod可能包含多个容器 这些容器使用同一个网络namespace（即:相同的ip和port空间，可直接用localhost通信）
+这些容器也可以共享存储  k8s挂载 volume到pod  就是将volume挂载到pob 中的每个容器。
+
+controller(Deployment、ReplicaSet.....Job 多种controller) 管理pob的多个副本并确保pob按期望的状态运行,一般是Deployment
+service 定义了外界访问一组特定pob的方式  有自己的ip和端口 ，service为pob提供了负载均衡
+k8s运行容器（pob）和访问容器（pob) 这两项任务分别由 controller 和 service 执行
+Namespace 多个用户或者项目使用同一个k8s ，即：可以将物理的集群（Cluster)逻辑上划分为多个虚拟的Cluster，可以将controller pod 等创建的资源划分开
+默认有两个  default （创建资源时不指定namespace 将被放到这个namespace）、kube-system(k8s自己创建的系统资源放在此namespace)
+
+k8s流程
+1、准备好对应的yanl文件，通过kubectl发送到Api Server中
+2、Api Server接收到客户端的请求将请求内容保存到etcd中
+3、Scheduler会监测etcd，发现没有分配节点的pod对象通过过滤和打分筛选出最适合的节点运行pod
+4、节点会通过conteiner runntime 运行对应pod的容器以及创建对应的副本数
+5、节点上的kubelet会对自己节点上的容器进行管理
+6、controler会监测集群中的每个节点，发现期望状态和实际状态不符合的话，就会通知对应的节点
+7、节点收到通知，会通过container runtime来对pod内的容器进行收缩或者扩张
+
+对于容器来说，管理的单位是容器
+对于k8s来说，管理的是一个pod应用
+一个pod上可以运行多个容器，可以将pod理解为一个虚拟机，一个虚拟机上运行了多个容器
