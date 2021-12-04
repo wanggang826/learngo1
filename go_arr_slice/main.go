@@ -59,8 +59,17 @@ func main()  {
 	//sd = append(sd, 100)
 	fmt.Println(sa,sb,arr) // [1 2 3 100 5] [2 3 100] [1 2 3 100 5 6 7]
 	//make([]T, size, cap) //创建切片
-	c := make([]int, 2, 10)
+	c := make([]int, 2, 2)
+	c[0] = 100
+	//c[1] = 200
+	appendS(c)
+	//c = append(c,800,900)
 	fmt.Println(c)
+	fmt.Println("test\n"+":t")
 
+}
 
+func appendS(s []int) []int{
+
+	return append(s,800,900)
 }
