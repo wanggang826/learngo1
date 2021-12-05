@@ -34,6 +34,28 @@ func c(ch1 chan int,ch2 chan int){
 	close(ch2)
 	wg.Done()
 }
+
+// channel 限制最大并发数 利用channel 阻塞特性 加上channel缓冲
+func channel(){
+	count := 10
+	sum := 100
+	c := make(chan struct{},count)
+	sc := make(chan struct{},sum)
+	defer close(c)
+	defer close(sc)
+	for i:= 0;i<sum;i++{
+		c <- struct{}{}
+		go func(j int) {
+			fmt.Println(j)
+			<- c
+			sc <- struct{}{}
+		}(i)
+	}
+	for i:= sum;i>0;i-- {
+		<-sc
+	}
+
+}
 func main()  {
 	ch1 := make(chan int,100)
 	ch2 := make(chan int,20)
